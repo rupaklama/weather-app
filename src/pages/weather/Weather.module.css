@@ -1,0 +1,54 @@
+.input {
+  margin-bottom: 4rem;
+}
+
+.button {
+  margin-bottom: 2rem;
+}
+
+.paragraph {
+  font-size: 1.6rem;
+}
+
+.heading {
+  margin-bottom: 1rem;
+  font-weight: 300;
+  font-size: 2rem;
+}
+
+.error {
+  font-size: 1.6rem;
+}
+
+.emojiOne {
+  font-size: 4rem;
+}
+
+.queryList {
+  list-style: none;
+  display: inline-block;
+  margin: 0 0.2rem;
+}
+
+.weatherList {
+  list-style: none;
+}
+
+.article {
+  font-weight: 300;
+  font-size: 1.6rem;
+}
+
+.emojiTwo {
+  font-size: 3rem;
+}
+
+.search {
+  margin-bottom: 4rem;
+  font-size: 1.2rem;
+}
+
+.searchHeading {
+  font-weight: 400;
+  font-size: 1.4rem;
+}

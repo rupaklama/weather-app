@@ -1,0 +1,18 @@
+.button {
+  border: none;
+  padding: 1rem 3rem;
+  cursor: pointer;
+  color: #fff;
+  background-color: #ff3366;
+  border-radius: 1rem;
+
+  transition: all 0.2s;
+}
+
+.button:hover {
+  background-color: #ba265d;
+}
+
+.button:active {
+  transform: translateY(2px);
+}

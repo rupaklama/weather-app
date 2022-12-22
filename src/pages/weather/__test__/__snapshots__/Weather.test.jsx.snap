@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`The <Weather /> component should render without any errors 1`] = `
+<DocumentFragment>
+  <section>
+    <div>
+      <p
+        class="emojiOne"
+      >
+         ⛈ 
+      </p>
+      <h2
+        class="heading"
+      >
+        Find your current weather forecast
+      </h2>
+    </div>
+    <div
+      class="input"
+    >
+      <div>
+        <label
+          class="label"
+          for="input-field"
+        >
+          Enter your city
+        </label>
+        <input
+          class="input"
+          id="input-field"
+          placeholder=""
+          value=""
+        />
+      </div>
+    </div>
+    <div
+      class="button"
+    >
+      <button
+        class="button"
+        type="button"
+      >
+        Get Forecast
+      </button>
+    </div>
+    <div
+      class="search"
+    >
+      <ul />
+    </div>
+  </section>
+</DocumentFragment>
+`;

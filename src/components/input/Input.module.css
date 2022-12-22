@@ -1,0 +1,25 @@
+.input {
+  width: 50%;
+
+  font-family: inherit;
+  font-size: 1.6rem;
+  color: inherit;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 2rem 3rem;
+  border-radius: 100px;
+
+  transition: all 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  width: 60%;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}

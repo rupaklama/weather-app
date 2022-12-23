@@ -27,7 +27,7 @@ const Weather = observer(() => {
   const [searchQueries, setSearchQueries] = useState([]);
 
   useEffect(() => {
-    window.navigator?.geolocation?.getCurrentPosition(
+    window.navigator.geolocation?.getCurrentPosition(
       position => {
         if (position) {
           setUserCoordinates({ lon: position.coords.longitude, lat: position.coords.latitude });
@@ -39,7 +39,7 @@ const Weather = observer(() => {
     if (userCoordinates.lat && userCoordinates.lon) {
       const fetchUserCity = () =>
         fetch(
-          `http://api.openweathermap.org/geo/1.0/reverse?lat=${userCoordinates.lat}&lon=${userCoordinates.lon}&appid=dd9dbc16899659de44ea30ebc32456a9`
+          `https://api.openweathermap.org/geo/1.0/reverse?lat=${userCoordinates.lat}&lon=${userCoordinates.lon}&appid=dd9dbc16899659de44ea30ebc32456a9`
         )
           .then(res => res.json())
           .then(data => {
@@ -54,8 +54,8 @@ const Weather = observer(() => {
     }
   }, [userCoordinates.lat, userCoordinates.lon, weatherStore]);
 
-  // if (initialLoading)
-  //   return <RotateLoader cssOverride={override} role="status" aria-label="Loading Spinner" color="#36ddbc" />;
+  if (initialLoading)
+    return <RotateLoader cssOverride={override} role="status" aria-label="Loading Spinner" color="#36ddbc" />;
 
   if (error) return <p className={styles.error}>Sorry, {error?.message}. Try again!</p>;
 

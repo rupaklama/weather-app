@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import PropTypes from "prop-types";
 
 import styles from "./Input.module.css";
@@ -22,7 +23,7 @@ const Input = ({ value, label, name, placeholder, type, onChange }) => (
 );
 
 Input.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.string.isRequired,
   label: PropTypes.string,
   name: PropTypes.string,
   placeholder: PropTypes.string,

@@ -6,6 +6,8 @@
 // learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom";
 
-import { toHaveNoViolations } from "jest-axe";
+import { toHaveNoViolations, configureAxe } from "jest-axe";
+
+configureAxe({});
 
 expect.extend(toHaveNoViolations);

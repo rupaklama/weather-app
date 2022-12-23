@@ -4,7 +4,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 export default class WeatherStore {
   weather = null;
 
-  initialLoading = true;
+  initialLoading = false;
 
   error = null;
 
@@ -13,9 +13,11 @@ export default class WeatherStore {
   }
 
   fetchWeather = async query => {
+    this.initialLoading = true;
+
     try {
       const response = await fetch(
-        `http://api.openweathermap.org/data/2.5/weather?q=${query}&APPID=dd9dbc16899659de44ea30ebc32456a9&units=imperial`
+        `https://api.openweathermap.org/data/2.5/weather?q=${query}&APPID=dd9dbc16899659de44ea30ebc32456a9&units=imperial`
       );
 
       const data = await response.json();

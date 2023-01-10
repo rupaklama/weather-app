@@ -3,7 +3,7 @@
 /* eslint-disable prettier/prettier */
 import { observer } from "mobx-react-lite";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import RotateLoader from "react-spinners/RotateLoader";
 
 import Button from "../../components/button/Button";
@@ -22,17 +22,15 @@ const Weather = observer(() => {
   const { initialLoading, error, weather } = weatherStore;
 
   const [userCoordinates, setUserCoordinates] = useState({ lon: "", lat: "" });
+
   const [userCity, setUserCity] = useState("");
   const [searchText, setSearchText] = useState("");
   const [searchQueries, setSearchQueries] = useState([]);
 
   useEffect(() => {
     window.navigator.geolocation?.getCurrentPosition(
-      position => {
-        if (position) {
-          setUserCoordinates({ lon: position.coords.longitude, lat: position.coords.latitude });
-        }
-      },
+      position => setUserCoordinates({ lon: position.coords.longitude, lat: position.coords.latitude }),
+
       err => console.log(err)
     );
 
@@ -43,6 +41,7 @@ const Weather = observer(() => {
         )
           .then(res => res.json())
           .then(data => {
+            // console.log(data);
             if (data) {
               weatherStore.fetchWeather(data[0]?.name);
               setUserCity(data[0]?.name);
@@ -57,7 +56,7 @@ const Weather = observer(() => {
   if (initialLoading)
     return <RotateLoader cssOverride={override} role="status" aria-label="Loading Spinner" color="#36ddbc" />;
 
-  if (error) return <p className={styles.error}>Sorry, {error?.message}. Try again!</p>;
+  if (error) return <article className={styles.error}>Sorry, {error?.message}. Try again!</article>;
 
   return (
     <section>
@@ -82,10 +81,12 @@ const Weather = observer(() => {
           onClick={() => {
             weatherStore.fetchWeather(searchText);
 
-            setSearchQueries([...searchQueries, ...searchText.split(" ")]);
+            setSearchQueries([...searchQueries, ...searchText.split("0")]);
           }}
         />
       </div>
+
+      <h3>Your City: {userCity}</h3>
 
       <div className={styles.search}>
         {searchQueries.length > 0 && <h4 className={styles.searchHeading}>search history:</h4>}
@@ -93,7 +94,7 @@ const Weather = observer(() => {
         <ul>
           {searchQueries.map((item, i) => (
             <li key={`query${i}`} className={styles.queryList}>
-              {item}
+              {item},
             </li>
           ))}
         </ul>

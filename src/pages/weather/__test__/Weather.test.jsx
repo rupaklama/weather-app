@@ -1,56 +1,183 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-undef */
-import { render, screen } from "@testing-library/react";
+import React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+import { setupServer } from "msw/node";
+import { rest } from "msw";
 
 import Weather from "../Weather";
 import { StoreContext, store } from "../../../stores/store";
 
+const data = {
+  coord: { lon: -74.0776, lat: 40.7282 },
+  weather: [{ id: 800, main: "Clear", description: "clear sky", icon: "01d" }],
+  base: "stations",
+  main: { temp: 42.67, feels_like: 34.95, temp_min: 39.07, temp_max: 45.14, pressure: 1013, humidity: 49 },
+  visibility: 10000,
+  wind: { speed: 16.11, deg: 280 },
+  clouds: { all: 0 },
+  dt: 1673299664,
+  sys: { type: 2, id: 2008776, country: "US", sunrise: 1673266801, sunset: 1673300774 },
+  timezone: -18000,
+  id: 5099836,
+  name: "Jersey City",
+  cod: 200,
+};
+
+let counter = 0;
+
+let query;
+
+const server = setupServer(
+  rest.get("https://api.openweathermap.org/data/2.5/weather", (req, res, ctx) => {
+    counter += 1;
+
+    query = req.url.searchParams.get("q");
+
+    return res(ctx.status(200), ctx.json(data));
+  })
+);
+
+beforeEach(() => {
+  counter = 0;
+  server.resetHandlers();
+});
+
+beforeAll(() => server.listen());
+
+afterAll(() => server.close());
+
+const setup = () => {
+  render(
+    <StoreContext.Provider value={store}>
+      <Weather />
+    </StoreContext.Provider>
+  );
+};
+
 describe("The <Weather /> component", () => {
-  beforeEach(() => {
-    render(
-      <StoreContext.Provider value={store}>
-        <Weather />
-      </StoreContext.Provider>
-    );
+  describe("layout", () => {
+    it("should render without any errors", () => {
+      setup();
+
+      const { asFragment } = render(<Weather />);
+      expect(asFragment()).toMatchSnapshot();
+    });
+
+    it("should display a Sub Heading", () => {
+      setup();
+
+      const headingEl = screen.getByRole("heading", { name: /find your current weather forecast/i });
+      expect(headingEl).toBeInTheDocument();
+    });
+
+    it("should have the Input initially empty", () => {
+      setup();
+
+      const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
+      expect(searchInputEl.value).toBe("");
+    });
+
+    it("should display a Button", () => {
+      setup();
+
+      const buttonEl = screen.getByRole("button", { name: /get forecast/i });
+      expect(buttonEl).toBeInTheDocument();
+    });
   });
 
-  it("should render without any errors", () => {
-    const { asFragment } = render(<Weather />);
-    expect(asFragment()).toMatchSnapshot();
-  });
+  describe("interactions", () => {
+    it("displays loader after api call", async () => {
+      setup();
 
-  it("should display a Sub Heading", () => {
-    const headingEl = screen.getByRole("heading", { name: /find your current weather forecast/i });
-    expect(headingEl).toBeInTheDocument();
+      const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
 
-    screen.debug();
-  });
+      userEvent.type(searchInputEl, "jersey city");
 
-  it("should display the Input initially empty", () => {
-    const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
-    expect(searchInputEl.value).toBe("");
-  });
+      const buttonEl = screen.getByRole("button", { name: /get forecast/i });
+      userEvent.click(buttonEl);
 
-  it("should be able to type in the Input", () => {
-    const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
-    userEvent.type(searchInputEl, "your city");
-    expect(searchInputEl.value).toBe("your city");
-  });
+      expect(await screen.findByRole("status")).toBeInTheDocument();
 
-  it("should display a Button", () => {
-    const buttonEl = screen.getByRole("button", { name: /get forecast/i });
-    expect(buttonEl).toBeInTheDocument();
-  });
+      await screen.findByText(data.name);
+    });
 
-  it("should able to submit the Input value on Button click and displays the data", async () => {
-    const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
-    userEvent.type(searchInputEl, "vegas");
+    it("sets user geo coords on mount", async () => {
+      const mockGeolocation = {
+        getCurrentPosition: jest.fn().mockImplementationOnce(success =>
+          Promise.resolve(
+            success({
+              coords: {
+                latitude: 40.7215682,
+                longitude: -74.047455,
+              },
+            })
+          )
+        ),
+      };
 
-    const buttonEl = screen.getByRole("button", { name: /get forecast/i });
-    userEvent.click(buttonEl);
+      global.navigator.geolocation = mockGeolocation;
 
-    expect(await screen.findByRole("article")).toBeInTheDocument();
+      setup();
+
+      expect(mockGeolocation.getCurrentPosition).toHaveBeenCalledTimes(2);
+
+      await screen.findByRole("status");
+
+      expect(await screen.findByRole("heading", { name: /your city/i })).toBeInTheDocument();
+    });
+
+    it("makes an api call with user input value on button submit", async () => {
+      setup();
+
+      const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
+
+      userEvent.type(searchInputEl, "jersey city");
+
+      const buttonEl = screen.getByRole("button", { name: /get forecast/i });
+      userEvent.click(buttonEl);
+
+      await screen.findByRole("status");
+
+      expect(await screen.findByText(data.name)).toBeInTheDocument();
+      expect(counter).toBe(1);
+    });
+
+    it("displays search history after api call", async () => {
+      setup();
+
+      const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
+
+      userEvent.type(searchInputEl, "jersey city");
+
+      const buttonEl = screen.getByRole("button", { name: /get forecast/i });
+      userEvent.click(buttonEl);
+
+      expect(await screen.findByRole("heading", { name: /search history/i })).toBeInTheDocument();
+    });
+
+    it("displays an error message on api call fail", async () => {
+      server.use(
+        rest.get("https://api.openweathermap.org/data/2.5/weather", (req, res, ctx) => {
+          return res(ctx.status(400));
+        })
+      );
+
+      setup();
+
+      const searchInputEl = screen.getByRole("textbox", { name: /enter your city/i });
+
+      userEvent.type(searchInputEl, "jersey city");
+
+      const buttonEl = screen.getByRole("button", { name: /get forecast/i });
+      userEvent.click(buttonEl);
+
+      await screen.findByRole("status");
+
+      expect(await screen.findByRole("article")).toBeInTheDocument();
+    });
   });
 });

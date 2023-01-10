@@ -1,9 +1,15 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-undef */
 import { render, screen } from "@testing-library/react";
 
 import { axe } from "jest-axe";
 
+import { setupServer } from "msw/node";
+import { rest } from "msw";
+
 import App from "./App";
+import { StoreContext, store } from "./stores/store";
+import Weather from "./pages/weather/Weather";
 
 describe("The <Weather /> component", () => {
   it("should display a header", () => {
@@ -11,8 +17,6 @@ describe("The <Weather /> component", () => {
     const headingEl = screen.getByText("Weather Buddy");
 
     expect(headingEl).toBeInTheDocument();
-
-    screen.debug();
   });
 
   it("should display a footer", () => {

@@ -35,9 +35,9 @@ export default class WeatherStore {
           this.error = data;
         });
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 1500);
       }
     } catch (err) {
       console.log(err);

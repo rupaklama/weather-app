@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`The <Weather /> component should render without any errors 1`] = `
+exports[`The <Weather /> component layout should render without any errors 1`] = `
 <DocumentFragment>
   <section>
     <div>
@@ -43,6 +43,9 @@ exports[`The <Weather /> component should render without any errors 1`] = `
         Get Forecast
       </button>
     </div>
+    <h3>
+      Your City: 
+    </h3>
     <div
       class="search"
     >
